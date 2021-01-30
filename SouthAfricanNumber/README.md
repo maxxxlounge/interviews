@@ -30,3 +30,21 @@ libraries for the heavy lifting is permitted. If you do use a database, please i
 Conclusion:
 Be creative and have loads of fun, project shouldn't take much longer than a couple of hours,
 we are not looking for perfection, just an insight into how you work.
+
+
+## DEPLOYMENT STRATEGY
+
+The correct format is assumed formed from : fixed prefix "2783" + 7 digits (0-9)
+
+
+Strategy:
+
+* Check the input data quality and validation
+ - file can be opened
+ - file has at less 2 column comma separated
+ - indexes are unique
+
+* Ingest the file and split the case in different groups (map with id index):
+    * numbers with critical error, intended as UnFixable because some information are missing
+    * numbers that can be fixed
+

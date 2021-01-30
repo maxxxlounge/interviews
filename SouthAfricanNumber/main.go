@@ -2,58 +2,60 @@ package main
 
 import (
 	"encoding/csv"
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/errors/fmt"
 	"io"
 	"os"
-	log "github.com/sirupsen/logrus"
 )
 
-type row struct{
-	originalNumber string
-	ChangedNumber string
-	Err error
-}
+func main() {
 
-var numbers map[string]row
+	loadedNumbers := make(map[string]*NumberManager.Row)
+	criticalNumbers := make(map[string]*NumberManager.Row)
+	fixableNumbers := make(map[string]*NumberManager.Row)
 
-func main(){
 
-	if len(os.Args) < 2{
+	if len(os.Args) < 2 {
 		log.Fatal("missing input file in args")
 	}
 
 	filepath := os.Args[1]
-	reader,err  := os.Open(filepath)
+	reader, err := os.Open(filepath)
+	defer reader.Close()
 	DieOnErr(err)
 	r := csv.NewReader(reader)
 	for {
-		record,err := r.Read()
+		record, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		DieOnErr(err)
-		row,err := GenerateRow(record[1])
+		row, err := NumberManager.New(record[1])
 		DieOnErr(err)
-		numbers[record[0]] = row
+		loadedNumbers[record[0]] = row
 	}
-}
 
-func GenerateRow(number string)(row,error){
-	r := row{
-		originalNumber: number,
+	for k, v := range loadedNumbers {
+		errStr := ""
+		err := NumberManager.FindCriticalError(v.GetOriginalGivenNumber())
+		if err != nil {
+			criticalNumbers[k] = v
+			errStr = err.Error()
+		}else{
+			fixableNumbers[k] = v
+		}
+		fmt.Printf("%v\t%v\t%v\n", k, v.GetOriginalGivenNumber(), errStr)
 	}
-	correctedNr, err := CorrectNumber(number)
-	r.ChangedNumber = correctedNr
-	r.Err = err
-	return r,nil
+
+	fmt.Println()
+	fmt.Printf("given numbers %v\n",len(loadedNumbers))
+	fmt.Printf("Critical numbers %v\n",len(criticalNumbers))
+	fmt.Printf("Fixable numbers %v\n",len(fixableNumbers))
 }
 
-func CorrectNumber(number string)(string, error){
- panic("not implemented")
-}
-
-
-func DieOnErr(err error){
-	if err!=nil{
+func DieOnErr(err error) {
+	if err != nil {
 		log.Fatal(err)
 	}
 }
