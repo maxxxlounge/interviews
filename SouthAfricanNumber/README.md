@@ -45,6 +45,7 @@ Strategy:
  - indexes are unique
 
 * Ingest the file and split the case in different groups (map with id index):
+    * numbers valid at first check (regex check)
     * numbers with critical error, intended as UnFixable because some information are missing
     * numbers that can be fixed
 
