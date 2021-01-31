@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/csv"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/errors/fmt"
 	"io"
+	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -14,6 +17,8 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("missing input file in args")
 	}
+
+	l := log.New()
 
 	filepath := os.Args[1]
 	reader, err := os.Open(filepath)
@@ -25,6 +30,7 @@ func main() {
 	criticalNumbers := make(map[string]*NumberManager.Row)
 	fixableNumbers := make(map[string]*NumberManager.Row)
 
+	l.Info("loading csv file")
 	r := csv.NewReader(reader)
 	//remove header
 	for {
@@ -38,44 +44,77 @@ func main() {
 		loadedNumbers[record[0]] = row
 	}
 
-	for k, v := range loadedNumbers {
-		isValidAtFirstAttempt := NumberManager.IsRightFormat(v.GetOriginalNumber())
-		if isValidAtFirstAttempt {
-			validNumbers[k] = v
-			validNumbers[k].Type = NumberManager.ValidFirstAttempt
-			continue
-		}
-		err := NumberManager.FindCriticalError(v.GetOriginalNumber())
-		if err != nil {
-			criticalNumbers[k] = v
-			criticalNumbers[k].Type = NumberManager.InvalidCritical
-			criticalNumbers[k].Errors = append(criticalNumbers[k].Errors, err)
-			continue
-		}
-		fixableNumbers[k] = v
-		fixableNumbers[k].Type = NumberManager.InvalidButFixable
-	}
+	l.Info("processing numbers...")
 
 	for k, v := range loadedNumbers {
+		switch v.Type {
+		case NumberManager.ValidFirstAttempt:
+			validNumbers[k] = v
+			break
+		case NumberManager.InvalidCritical:
+			criticalNumbers[k] = v
+			break
+		case NumberManager.InvalidButFixable:
+			fixableNumbers[k] = v
+			break
+		}
+	}
+	fmt.Println()
+	fmt.Printf("given numbers %v\n", len(loadedNumbers))
+	fmt.Println("---")
+	fmt.Printf("valid numbers %v\n", len(validNumbers))
+	fmt.Printf("Fixable numbers %v\n", len(fixableNumbers))
+	fmt.Printf("Critical numbers %v\n", len(criticalNumbers))
+	fmt.Println("---")
+	fmt.Printf("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
+
+	l.Info("starting endpoing on port")
+
+	var h http.Handler
+
+
+	http.HandleFunc("/numbers",func(w http.ResponseWriter,r *http.Request){
+		w.Header().Add("Content-Type", "application/json")
+		handler.ShowNumbers(w,loadedNumbers)
+	})
+	http.HandleFunc("/numbers/valid",func(w http.ResponseWriter,r *http.Request){
+		w.Header().Add("Content-Type", "application/json")
+		handler.ShowNumbers(w,validNumbers)
+	})
+	http.HandleFunc("/numbers/critical",func(w http.ResponseWriter,r *http.Request){
+		w.Header().Add("Content-Type", "application/json")
+		handler.ShowNumbers(w,criticalNumbers)
+	})
+	http.HandleFunc("/numbers/fixable",func(w http.ResponseWriter,r *http.Request){
+		w.Header().Add("Content-Type", "application/json")
+		handler.ShowNumbers(w,fixableNumbers)
+	})
+
+	s := &http.Server{
+		Addr:           ":8888",
+		Handler:        h,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	log.Fatal(s.ListenAndServe())
+}
+
+func Print(m map[string]NumberManager.Row){
+	for k, v := range m {
 		var errOutput string
 		for ei, e := range v.Errors {
 			if ei > 0 {
 				errOutput += ", "
 			}
-			errOutput += e.Error()
+			errOutput += e
 		}
-		out := fmt.Sprintf("%v\t%v\t%v:\t%v", k, v.GetOriginalNumber(), v.Type, errOutput)
+		out := fmt.Sprintf("%v\t%v\t%v:\t%v", k, v.Original, v.Type, errOutput)
 		if v.Type == NumberManager.InvalidButFixable {
-			out += " " + v.GetChangedNumber() + "\t"
+			out += " " + v.Original + "\t"
 		}
 		fmt.Println(out)
 	}
-
-	fmt.Println()
-	fmt.Printf("given numbers %v\n", len(loadedNumbers))
-	fmt.Printf("valid numbers %v\n", len(validNumbers))
-	fmt.Printf("Fixable numbers %v\n", len(fixableNumbers))
-	fmt.Printf("Critical numbers %v\n", len(criticalNumbers))
 }
 
 func DieOnErr(err error) {
