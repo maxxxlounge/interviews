@@ -33,17 +33,16 @@ func main() {
 	l.Info("loading csv file")
 	r := csv.NewReader(reader)
 	//remove header
+	r.Read()
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		DieOnErr(err)
-		row, err := NumberManager.New(record[1])
-		DieOnErr(err)
+		row := NumberManager.New(record[1])
 		loadedNumbers[record[0]] = row
 	}
-
 	l.Info("processing numbers...")
 
 	for k, v := range loadedNumbers {
@@ -59,6 +58,9 @@ func main() {
 			break
 		}
 	}
+
+	
+
 	fmt.Println()
 	fmt.Printf("given numbers %v\n", len(loadedNumbers))
 	fmt.Println("---")
@@ -69,25 +71,27 @@ func main() {
 	fmt.Printf("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
 
 	l.Info("starting endpoing on port")
-
 	var h http.Handler
-
-
-	http.HandleFunc("/numbers",func(w http.ResponseWriter,r *http.Request){
+	http.HandleFunc("/numbers", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w,loadedNumbers)
+		handler.ShowNumbers(w, loadedNumbers)
 	})
-	http.HandleFunc("/numbers/valid",func(w http.ResponseWriter,r *http.Request){
+	http.HandleFunc("/numbers/valid", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w,validNumbers)
+		handler.ShowNumbers(w, validNumbers)
 	})
-	http.HandleFunc("/numbers/critical",func(w http.ResponseWriter,r *http.Request){
+	http.HandleFunc("/numbers/critical", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w,criticalNumbers)
+		handler.ShowNumbers(w, criticalNumbers)
 	})
-	http.HandleFunc("/numbers/fixable",func(w http.ResponseWriter,r *http.Request){
+	http.HandleFunc("/numbers/fixable", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w,fixableNumbers)
+		handler.ShowNumbers(w, fixableNumbers)
+	})
+	http.HandleFunc("/numbers/check", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		p1 := r.URL.Query().Get("number")
+		handler.Check(w, p1)
 	})
 
 	s := &http.Server{
@@ -100,7 +104,7 @@ func main() {
 	log.Fatal(s.ListenAndServe())
 }
 
-func Print(m map[string]NumberManager.Row){
+func Print(m map[string]NumberManager.Row) {
 	for k, v := range m {
 		var errOutput string
 		for ei, e := range v.Errors {

@@ -14,10 +14,10 @@ func TestTrimNotNumbersDigit(t *testing.T) {
 }
 
 func TestIsRightFormat(t *testing.T) {
-	assert.True(t,NumberManager.IsRightFormat("27831234567"))
-	assert.False(t,NumberManager.IsRightFormat("27836826107_DELETED_1488996550"))
-	assert.False(t,NumberManager.IsRightFormat("278368261071488996550"))
-	assert.False(t,NumberManager.IsRightFormat("27841234567"))
-	assert.False(t,NumberManager.IsRightFormat(""))
-	assert.False(t,NumberManager.IsRightFormat("2784"))
+	assert.True(t, NumberManager.IsRightFormat("27831234567"))
+	assert.False(t, NumberManager.IsRightFormat("27836826107_DELETED_1488996550"))
+	assert.False(t, NumberManager.IsRightFormat("278368261071488996550"))
+	assert.False(t, NumberManager.IsRightFormat("27841234567"))
+	assert.False(t, NumberManager.IsRightFormat(""))
+	assert.False(t, NumberManager.IsRightFormat("2784"))
 }

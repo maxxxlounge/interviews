@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func FindFixableError(number string) ([]string,string) {
+func FindFixableError(number string) ([]string, string) {
 	var changed string
 	var errs []string
 	var err error
@@ -16,17 +16,17 @@ func FindFixableError(number string) ([]string,string) {
 		errs = append(errs, err.Error())
 	}
 	changed = TrimNotNumbersDigit(number)
-	changed,err = AddDigitsWithPrefix(changed)
+	changed, err = AddDigitsWithPrefix(changed)
 	if err != nil {
-		errs = append(errs,err.Error())
+		errs = append(errs, err.Error())
 	}
-	changed,err = ReplacePrefix(changed)
+	changed, err = ReplacePrefix(changed)
 	if err != nil {
-		errs = append(errs,err.Error())
+		errs = append(errs, err.Error())
 	}
-	changed,err = CutAdditionalDigits(changed)
+	changed, err = CutAdditionalDigits(changed)
 	if err != nil {
-		errs = append(errs,err.Error())
+		errs = append(errs, err.Error())
 	}
-	return errs,changed
+	return errs, changed
 }

@@ -19,31 +19,31 @@ const InvalidButFixable NumberType = "InvalidButFixable"
 type Row struct {
 	Original string
 	Changed  string
-	Errors   []string `json:"string"`
+	Errors   []string `json:"Errors,omitempty"`
 	Type     NumberType
 }
 
-func New(fullNumber string) (*Row, error) {
+func New(fullNumber string) *Row {
 	r := Row{
 		Original: fullNumber,
 	}
 	if IsRightFormat(fullNumber) {
 		r.Type = ValidFirstAttempt
-		return &r, nil
+		return &r
 	}
 	err := FindCriticalError(fullNumber)
 	if err != nil {
 		r.Type = InvalidCritical
 		r.Errors = append(r.Errors, err.Error())
-		return &r, nil
+		return &r
 	}
 	r.Type = InvalidButFixable
-	r.Errors,r.Changed = FindFixableError(fullNumber)
-	return &r, nil
+	r.Errors, r.Changed = FindFixableError(fullNumber)
+	return &r
 }
 
 func IsRightFormat(number string) bool {
-	if (len(number)!=prefixLen+CoreLen){
+	if len(number) != prefixLen+CoreLen {
 		return false
 	}
 	matchedRegex, err := regexp.MatchString(RightPrefix+"[0-9]{7}", number)
