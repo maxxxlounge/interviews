@@ -85,13 +85,16 @@ func main() {
 		}
 	})
 	http.HandleFunc("/numbers/check", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin:", "*")
 		w.Header().Add("Content-Type", "application/json")
 		p1 := r.URL.Query().Get("number")
 		handler.Check(w, p1)
 	})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	fs := http.FileServer(http.Dir("./public"))
+	http.Handle("/",fs)
+	/*http.Handle("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./public/search.html")
-	})
+	})*/
 
 	s := &http.Server{
 		Addr:           ":8888",

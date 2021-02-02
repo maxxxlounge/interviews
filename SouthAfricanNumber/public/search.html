@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>South African Numbers Checker</title>
+    <script type="application/javascript" src="jquery-3.5.1.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 </head>
 <body>
@@ -11,17 +12,69 @@
         <div class="row">
             <div class="col-12">
                 <h1>South African Numbers Checker</h1>
+                <h2>Insert phone number to check</h2>
             </div>
         </div>
         <div class="row">
-                <div class="col-12">
-                    <label for="number-search.input" class="form-label">Insert phone number to check</label>
-                    <input type="text" class="form-control" id="number" placeholder="27831234567">
+                <div class="col-10">
+                    <input type="text" class="form-control" id="number_input" placeholder="27831234567">
                 </div>
-                <div class="col-6">
-                    <button type="button" class="btn btn-lg btn-primary">Check</button>
+                <div class="col-2 ">
+                    <button id="btn_number_check" type="button" class="btn btn-lg btn-primary">Check</button>
                 </div>
         </div>
+        <div class="row">
+            <div class="col-6">
+                inserted:
+                <h2><span id="original" class=""></span><h2>
+            </div>
+            <div class="col-6">
+                changed:
+                <h2><span id="changed" class=""></span><h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                errors:
+                <div id="errors"></div>
+            </div>
+        </div>
     </div>
+    <script type="application/javascript">
+        $(function() {
+            $("#btn_number_check").click( function()
+                {
+                    $('#original').text("");
+                    $('#changed').text("");
+                    $('#errors').empty();
+                    var searchParam = $('#number_input').val();
+                    if (searchParam == undefined){
+                        searchParam="";
+                    }
+                    url = "/numbers/check?number=" + searchParam;
+                    $.ajax({
+                            dataType:"json",
+                            url:url,
+                            success: function (data) {
+                                $('#original').text(resp.Original);
+                            },
+                            error: function (data) {
+                                var resp = data.responseJSON;
+                                if (!resp){
+                                    $('#errors').append('<div class="alert alert-danger">' + data.responseText + '</div>');
+                                    return;
+                                }
+                                $('#original').text(resp.Original);
+                                $('#changed').text(resp.Changed);
+                                resp.Errors.forEach(function(err){
+                                    $('#errors').append('<div class="alert alert-danger">' + err + '</div>');
+                                });
+                            },
+                        }
+                    )
+                }
+            );
+        });
+    </script>
 </body>
 </html>
