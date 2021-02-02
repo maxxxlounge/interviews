@@ -3,9 +3,12 @@ package NumberManager
 import (
 	"github.com/pkg/errors"
 	"strconv"
-
 )
 
+/**
+FindFixableError process record and give errors and fix suggestion
+number is the given string
+*/
 func FindFixableError(number string) ([]string, string) {
 	var changed string
 	var errs []string
@@ -16,7 +19,10 @@ func FindFixableError(number string) ([]string, string) {
 		err = errors.Errorf("error parsing '%s' to 0-9 digit, remove non number digits", number)
 		errs = append(errs, err.Error())
 	}
-	changed = TrimNotNumbersDigit(number)
+	changed, err = TrimNotNumbersDigitWithError(number)
+	if err != nil {
+		errs = append(errs, err.Error())
+	}
 	changed, err = AddDigitsWithPrefix(changed)
 	if err != nil {
 		errs = append(errs, err.Error())

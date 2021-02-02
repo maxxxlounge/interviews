@@ -54,10 +54,26 @@ func IsRightFormat(number string) bool {
 	return matchedRegex
 }
 
+func TrimNotNumbersDigitWithError(input string) (string, error) {
+	onlyNumberRegex, err := regexp.Compile("[^0-9]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	out := onlyNumberRegex.ReplaceAllString(input, "")
+	if out != input {
+		return out, errors.New(ErrorNotNumericDigits)
+	}
+	return input, nil
+}
+
 func TrimNotNumbersDigit(input string) string {
 	onlyNumberRegex, err := regexp.Compile("[^0-9]+")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return onlyNumberRegex.ReplaceAllString(input, "")
+	out := onlyNumberRegex.ReplaceAllString(input, "")
+	if out != input {
+		return out
+	}
+	return input
 }

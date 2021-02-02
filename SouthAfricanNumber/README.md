@@ -31,13 +31,28 @@ Conclusion:
 Be creative and have loads of fun, project shouldn't take much longer than a couple of hours,
 we are not looking for perfection, just an insight into how you work.
 
+-
 
 ## DEPLOYMENT STRATEGY
 
+The input file is intended as first row headers, and comma separated values
 The correct format is assumed formed from : fixed prefix "2783" + 7 digits (0-9)
 
+### Configuration:
 
-Strategy:
+| param | default | description |
+|---|---|---|
+|-p | "8888" | listen port |
+|-i | "input.csv" | input source file |
+|-d | "output.json" | destination file (json) |
+
+eg:
+
+```sh
+go run main.go -d=pippo.json
+```
+
+### Description:
 
 * Check the input data quality and validation
  - file can be opened
@@ -48,4 +63,51 @@ Strategy:
     * numbers valid at first check (regex check)
     * numbers with critical error, intended as UnFixable because some information are missing
     * numbers that can be fixed
+
+Data format is map of reference and each record is :
+
+| key | type |
+|---|---|
+| key | string | give index from file (it could be a unsigned big int if SQL db used) |
+| Original | string | original imput number |
+| Changed | string | the result of changes applied |
+| Type | custom (like enum) | decription a string like field to control the 3 possible state (ValidFirstAttempt,InvalidCritical,InvalidButFixable)  |
+| Errors | []string | string array with description about errors occurred |
+
+An example of a record
+```json
+"103425772": {
+        "Original": "27832719392",
+        "Changed": "",
+        "Type": "ValidFirstAttempt",
+        "Errors":["errors1", "errors2"]
+    }
+```
+
+The chosen format to best represent the data for a user to interpret and API endpoint is JSON
+
+* Data it is stored in memory and in "output.json" for other uses,
+so, it doesn't need DB, 'cause specifics don't ask for resource modification, so no store different from input file needed
+
+Endpoints:
+
+    ```
+    GET localhost:8888/numbers  return all loaded numbers (NB: it doesn't used rest because is a search and resource returned is the same (numbers))
+    GET localhost:8888/numbers?type={$type}   the values of type field is (valid,fixable,critical)
+
+    GET localhost:8888/numbers?type=valid
+    GET localhost:8888/numbers?type=critical
+    GET localhost:8888/numbers?type=fixable
+
+    GET localhost:8888/numbers/check?number=
+    The number check endpoint, if empty string passed return a 400 "missing number" error
+    It returns always 400 in case of InvalidCritical type number and InvalidButFixable because it means a "Bad request"
+    it return 200 for ValidFirstAttempt number type
+
+    GET localhost:8888/check.html main check number page
+
+    ```
+    http://localhost:8888/numbers/check?number=123123
+    ```
+
 

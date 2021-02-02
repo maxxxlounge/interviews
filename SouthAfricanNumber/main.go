@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
+	"encoding/json"
+	"flag"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/errors/fmt"
 	"io"
 	"net/http"
 	"os"
@@ -13,15 +16,13 @@ import (
 )
 
 func main() {
-
-	if len(os.Args) < 2 {
-		log.Fatal("missing input file in args")
-	}
+	var fileSource = flag.String("i", "input.csv", "-i input source file")
+	var storeFile = flag.String("d", "output.json", "-d destination file (json)")
+	var port = flag.String("p", "8888", "-p listen port")
+	flag.Parse()
 
 	l := log.New()
-
-	filepath := os.Args[1]
-	reader, err := os.Open(filepath)
+	reader, err := os.Open(*fileSource)
 	defer reader.Close()
 	DieOnErr(err)
 
@@ -34,14 +35,27 @@ func main() {
 	r := csv.NewReader(reader)
 	//remove header
 	r.Read()
+	rowindex := 0
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		DieOnErr(err)
+
+		//prevent missing columns
+		if len(record)<2{
+			DieOnErr(errors.Errorf("bad input file format, missing column at line %v",rowindex))
+		}
+
+		// prevent duplicated index
+		if _, ok := loadedNumbers[record[0]]; ok {
+			log.Fatalf("duplicated index '%v' on row '%v' ", record[0], rowindex)
+		}
+
 		row := NumberManager.New(record[1])
 		loadedNumbers[record[0]] = row
+		rowindex++
 	}
 	l.Info("processing numbers...")
 
@@ -59,16 +73,14 @@ func main() {
 		}
 	}
 
-	fmt.Println()
-	fmt.Printf("given numbers %v\n", len(loadedNumbers))
-	fmt.Println("---")
-	fmt.Printf("valid numbers %v\n", len(validNumbers))
-	fmt.Printf("Fixable numbers %v\n", len(fixableNumbers))
-	fmt.Printf("Critical numbers %v\n", len(criticalNumbers))
-	fmt.Println("---")
-	fmt.Printf("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
+	log.Info("given numbers %v\n", len(loadedNumbers))
+	log.Info("---")
+	log.Info("valid numbers %v\n", len(validNumbers))
+	log.Info("Fixable numbers %v\n", len(fixableNumbers))
+	log.Info("Critical numbers %v\n", len(criticalNumbers))
+	log.Info("---")
+	log.Info("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
 
-	l.Info("starting endpoing on port")
 	var h http.Handler
 	http.HandleFunc("/numbers", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
@@ -90,37 +102,44 @@ func main() {
 		p1 := r.URL.Query().Get("number")
 		handler.Check(w, p1)
 	})
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/",fs)
-	/*http.Handle("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./public/search.html")
-	})*/
 
+	fs := http.FileServer(http.Dir("./public"))
+	http.Handle("/", fs)
 	s := &http.Server{
-		Addr:           ":8888",
+		Addr:           ":" + *port,
 		Handler:        h,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	l.Infof("saving data on '%s ", *storeFile)
+	err = Store(loadedNumbers, *storeFile)
+	if err != nil {
+		// not die because the service still up
+		err = errors.Wrap(err, "error storing data on file")
+		log.Warn(err)
+	}
+	l.Infof("starting endpoint on port :%s", *port)
 	log.Fatal(s.ListenAndServe())
 }
 
-func Print(m map[string]NumberManager.Row) {
-	for k, v := range m {
-		var errOutput string
-		for ei, e := range v.Errors {
-			if ei > 0 {
-				errOutput += ", "
-			}
-			errOutput += e
-		}
-		out := fmt.Sprintf("%v\t%v\t%v:\t%v", k, v.Original, v.Type, errOutput)
-		if v.Type == NumberManager.InvalidButFixable {
-			out += " " + v.Original + "\t"
-		}
-		fmt.Println(out)
+func Store(m map[string]*NumberManager.Row, filepath string) error {
+	f, err := os.Create(filepath)
+	if err != nil {
+		return err
 	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	out, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(out)
+	if err != nil {
+		return err
+	}
+	w.Flush()
+	return nil
 }
 
 func DieOnErr(err error) {
