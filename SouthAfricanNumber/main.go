@@ -59,8 +59,6 @@ func main() {
 		}
 	}
 
-	
-
 	fmt.Println()
 	fmt.Printf("given numbers %v\n", len(loadedNumbers))
 	fmt.Println("---")
@@ -74,24 +72,25 @@ func main() {
 	var h http.Handler
 	http.HandleFunc("/numbers", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w, loadedNumbers)
-	})
-	http.HandleFunc("/numbers/valid", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w, validNumbers)
-	})
-	http.HandleFunc("/numbers/critical", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w, criticalNumbers)
-	})
-	http.HandleFunc("/numbers/fixable", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		handler.ShowNumbers(w, fixableNumbers)
+		p := r.URL.Query().Get("type")
+		switch p {
+		case "valid":
+			handler.ShowNumbers(w, validNumbers)
+		case "critical":
+			handler.ShowNumbers(w, criticalNumbers)
+		case "fixable":
+			handler.ShowNumbers(w, fixableNumbers)
+		default:
+			handler.ShowNumbers(w, loadedNumbers)
+		}
 	})
 	http.HandleFunc("/numbers/check", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		p1 := r.URL.Query().Get("number")
 		handler.Check(w, p1)
+	})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./public/search.html")
 	})
 
 	s := &http.Server{
