@@ -100,14 +100,13 @@ Endpoints:
     GET localhost:8888/numbers?type=fixable
 
     GET localhost:8888/numbers/check?number=
+    eg:     http://localhost:8888/numbers/check?number=123123
     The number check endpoint, if empty string passed return a 400 "missing number" error
     It returns always 400 in case of InvalidCritical type number and InvalidButFixable because it means a "Bad request"
     it return 200 for ValidFirstAttempt number type
 
     GET localhost:8888/check.html main check number page
 
-    ```
-    http://localhost:8888/numbers/check?number=123123
     ```
 
 
