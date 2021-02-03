@@ -31,7 +31,6 @@ func New(fullNumber string) *Row {
 	return &r
 }
 
-
 // HasNotNumberDigits verify if not number digits is present
 // used despite of integer conversion check because the max was 4294967295
 // If get and error during regex compile, it exit with fatal

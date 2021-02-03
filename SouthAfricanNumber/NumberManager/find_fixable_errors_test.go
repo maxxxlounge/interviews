@@ -25,13 +25,13 @@ func TestFindFixableError(t *testing.T) {
 			hasError:       true,
 		},
 		"MorethanIntManage": {
-			input:          "123123123123123123123",
-			changed:        NumberManager.RightPrefix + "2312312",
+			input:   "123123123123123123123",
+			changed: NumberManager.RightPrefix + "2312312",
 			expectedErrMsg: []string{
 				NumberManager.ErrorCutExtraDigits,
 				NumberManager.ErrorWrongPrefix,
 			},
-			hasError:       true,
+			hasError: true,
 		},
 	}
 

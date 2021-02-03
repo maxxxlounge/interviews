@@ -2,13 +2,12 @@ package NumberManager
 
 import "errors"
 
-
 // AddDigitsWithPrefix add missing prefix digits before number if needed
 // If number digits is more than prefix+core len exit
 // If prefix digit added, it returns a error
 // return changed number and error if changes occurred
 func AddDigitsWithPrefix(number string) (string, error) {
-	if HasNotNumberDigits(number){
+	if HasNotNumberDigits(number) {
 		number = TrimNotNumbersDigit(number)
 	}
 	if len(number) >= CoreLen+prefixLen {
@@ -23,7 +22,7 @@ func AddDigitsWithPrefix(number string) (string, error) {
 // ReplacePrefix identify and replace wrong prefix if needed
 // return changed number and error if changes occurred
 func ReplacePrefix(number string) (string, error) {
-	if HasNotNumberDigits(number){
+	if HasNotNumberDigits(number) {
 		number = TrimNotNumbersDigit(number)
 	}
 	if len(number) < CoreLen {
@@ -40,7 +39,7 @@ func ReplacePrefix(number string) (string, error) {
 // CutAdditionalDigits remove the extra numeric digits at the end of input
 // return changed number and error if changes occurred
 func CutAdditionalDigits(number string) (string, error) {
-	if HasNotNumberDigits(number){
+	if HasNotNumberDigits(number) {
 		number = TrimNotNumbersDigit(number)
 	}
 	if len(number) <= CoreLen+prefixLen {

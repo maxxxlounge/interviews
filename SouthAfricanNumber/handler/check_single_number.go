@@ -25,8 +25,8 @@ func Check(w http.ResponseWriter, number string) {
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	_,err = w.Write(out)
+	_, err = w.Write(out)
 	if err != nil {
-		log.Printf("error on write: %v",err)
+		log.Printf("error on write: %v", err)
 	}
 }

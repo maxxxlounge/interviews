@@ -34,7 +34,7 @@ func main() {
 	l.Info("loading csv file")
 	r := csv.NewReader(reader)
 	//remove header
-	_,err = r.Read()
+	_, err = r.Read()
 	if err != nil {
 		l.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func main() {
 		}
 	}
 
-	log.Infof	("given numbers %v\n", len(loadedNumbers))
+	log.Infof("given numbers %v\n", len(loadedNumbers))
 	log.Infof("---")
 	log.Infof("valid numbers %v\n", len(validNumbers))
 	log.Infof("Fixable numbers %v\n", len(fixableNumbers))
