@@ -38,6 +38,9 @@ we are not looking for perfection, just an insight into how you work.
 The input file is intended as first row headers, and comma separated values
 The correct format is assumed formed from : fixed prefix "2783" + 7 digits (0-9)
 
+the prefix is called Prefix
+the 7 digit after prefix is called the "core" part
+
 ### Configuration:
 
 | param | default | description |
@@ -49,7 +52,11 @@ The correct format is assumed formed from : fixed prefix "2783" + 7 digits (0-9)
 eg:
 
 ```sh
-go run main.go -d=pippo.json
+#with default parameters values
+go run main.go
+
+#with custom parameters values
+go run main.go -d=pippo.json -i=other_input.csv -p=8899
 ```
 
 ### Description:
@@ -109,4 +116,15 @@ Endpoints:
 
     ```
 
+### Correction strategy
 
+minimum fixable number is consider having equal or more than "core" part (7) numberic digit
+numbers with numeric part less than 7 are considered critical and un-fixable
+
+| inserted | changes | description |
+|---|---|---|
+| __some text_27831234567 | 27831234567 | adding prefix to complete number, applied to all input |
+| 1234567 | 27831234567 | adding prefix to complete number |
+| 121234567 | 27121234567 | adding prefix missing digit to complete number (to separate error of wrong and partial prefix)|
+| 27811234567 | 27831234567 | replace wrong perfix |
+| 278112345672 | 27811234567 | cut exceed digits |
