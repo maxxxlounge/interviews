@@ -2,12 +2,15 @@ package NumberManager
 
 import "errors"
 
-const ErrorMissingPartialPrefix = "some number are missing added prefix"
-const ErrorWrongPrefix = "wrong prefix, replace with the correct one"
-const ErrorCutExtraDigits = "digit number more than wanted format, the exceeding was cut "
-const ErrorNotNumericDigits = "found not numeric digits, removed"
 
+// AddDigitsWithPrefix add missing prefix digits before number if needed
+// If number digits is more than prefix+core len exit
+// If prefix digit added, it returns a error
+// return changed number and error if changes occurred
 func AddDigitsWithPrefix(number string) (string, error) {
+	if HasNotNumberDigits(number){
+		number = TrimNotNumbersDigit(number)
+	}
 	if len(number) >= CoreLen+prefixLen {
 		return number, nil
 	}
@@ -17,19 +20,29 @@ func AddDigitsWithPrefix(number string) (string, error) {
 	return number, err
 }
 
+// ReplacePrefix identify and replace wrong prefix if needed
+// return changed number and error if changes occurred
 func ReplacePrefix(number string) (string, error) {
-	if len(number) < CoreLen {
-		return RightPrefix + number, errors.New(ErrMsgLessThanCore)
+	if HasNotNumberDigits(number){
+		number = TrimNotNumbersDigit(number)
 	}
-	if number[0:3] == RightPrefix {
+	if len(number) < CoreLen {
+		return "", errors.New(ErrMsgLessThanCore)
+	}
+	if number[0:prefixLen] == RightPrefix {
 		return number, nil
 	}
-	number = RightPrefix + number[4:]
+	number = RightPrefix + number[prefixLen:]
 	err := errors.New(ErrorWrongPrefix)
 	return number, err
 }
 
+// CutAdditionalDigits remove the extra numeric digits at the end of input
+// return changed number and error if changes occurred
 func CutAdditionalDigits(number string) (string, error) {
+	if HasNotNumberDigits(number){
+		number = TrimNotNumbersDigit(number)
+	}
 	if len(number) <= CoreLen+prefixLen {
 		return number, nil
 	}

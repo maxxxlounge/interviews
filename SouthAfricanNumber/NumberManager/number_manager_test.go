@@ -3,48 +3,8 @@ package NumberManager_test
 import (
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
 )
-
-func TestTrimNotNumbersDigitWithError(t *testing.T) {
-	tests := map[string]struct {
-		input    string
-		errMsg   string
-		expected string
-		hasError bool
-	}{
-		"EmptySpaces": {
-			input:    " 1 ",
-			expected: "1",
-			errMsg:   NumberManager.ErrorNotNumericDigits,
-			hasError: true,
-		},
-		"StrangerChars": {
-			input:    "AD12S!\"%&L120I ",
-			expected: "12120",
-			errMsg:   NumberManager.ErrorNotNumericDigits,
-			hasError: true,
-		},
-		"NothingToChange": {
-			input:    "1234567891234",
-			expected: "1234567891234",
-			errMsg:   "",
-			hasError: false,
-		},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			out, err := NumberManager.TrimNotNumbersDigitWithError(tc.input)
-			require.Equal(t, err != nil, tc.hasError)
-			if tc.hasError {
-				assert.Equal(t, tc.expected, out)
-			}
-		})
-	}
-
-}
 
 func TestTrimNotNumbersDigit(t *testing.T) {
 	tests := map[string]struct {
@@ -74,6 +34,36 @@ func TestTrimNotNumbersDigit(t *testing.T) {
 		})
 	}
 
+}
+
+func TestHasNotNumberDigits(t *testing.T) {
+	tests := map[string]struct {
+		input    string
+		expected bool
+	}{
+		"HasOnlyNumber": {
+			input:    "12312312312",
+			expected: false,
+		},
+		"HasNumberAndSpaces": {
+			input:    "123 1231 2312",
+			expected: true,
+		},
+		"HasOnlyNotNumbers": {
+			input:    "asdasdsd asdasd",
+			expected: true,
+		},
+		"MoreThanParseIntCheck": {
+			input:    "12345678923456789123456789123459",
+			expected: false,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			out := NumberManager.HasNotNumberDigits(tc.input)
+			assert.Equal(t, tc.expected, out)
+		})
+	}
 }
 
 /*

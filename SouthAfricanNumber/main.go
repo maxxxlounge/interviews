@@ -23,8 +23,8 @@ func main() {
 
 	l := log.New()
 	reader, err := os.Open(*fileSource)
-	defer reader.Close()
 	DieOnErr(err)
+	defer reader.Close()
 
 	validNumbers := make(map[string]*NumberManager.Row)
 	loadedNumbers := make(map[string]*NumberManager.Row)
@@ -34,7 +34,10 @@ func main() {
 	l.Info("loading csv file")
 	r := csv.NewReader(reader)
 	//remove header
-	r.Read()
+	_,err = r.Read()
+	if err != nil {
+		l.Fatal(err)
+	}
 	rowindex := 0
 	for {
 		record, err := r.Read()
@@ -44,8 +47,8 @@ func main() {
 		DieOnErr(err)
 
 		//prevent missing columns
-		if len(record)<2{
-			DieOnErr(errors.Errorf("bad input file format, missing column at line %v",rowindex))
+		if len(record) < 2 {
+			DieOnErr(errors.Errorf("bad input file format, missing column at line %v", rowindex))
 		}
 
 		// prevent duplicated index
@@ -63,23 +66,20 @@ func main() {
 		switch v.Type {
 		case NumberManager.ValidFirstAttempt:
 			validNumbers[k] = v
-			break
 		case NumberManager.InvalidCritical:
 			criticalNumbers[k] = v
-			break
 		case NumberManager.InvalidButFixable:
 			fixableNumbers[k] = v
-			break
 		}
 	}
 
-	log.Info("given numbers %v\n", len(loadedNumbers))
-	log.Info("---")
-	log.Info("valid numbers %v\n", len(validNumbers))
-	log.Info("Fixable numbers %v\n", len(fixableNumbers))
-	log.Info("Critical numbers %v\n", len(criticalNumbers))
-	log.Info("---")
-	log.Info("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
+	log.Infof	("given numbers %v\n", len(loadedNumbers))
+	log.Infof("---")
+	log.Infof("valid numbers %v\n", len(validNumbers))
+	log.Infof("Fixable numbers %v\n", len(fixableNumbers))
+	log.Infof("Critical numbers %v\n", len(criticalNumbers))
+	log.Infof("---")
+	log.Infof("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
 
 	var h http.Handler
 	http.HandleFunc("/numbers", func(w http.ResponseWriter, r *http.Request) {

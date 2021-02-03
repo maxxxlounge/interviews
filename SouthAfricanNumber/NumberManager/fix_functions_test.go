@@ -34,6 +34,18 @@ func TestAddDigitsWithPrefix(t *testing.T) {
 			expected: "27831234567",
 			errMsg:   NumberManager.ErrorMissingPartialPrefix,
 		},
+		"NotOnlyNmberInputOK":{
+			hasError:false,
+			input:"_DELECTED_27831234567_DELETED",
+			expected: "27831234567",
+			errMsg:"",
+		},
+		"NotOnlyNmberInputWithErr":{
+			hasError:true,
+			input:"_DELECTED_7831234567_DELETED",
+			expected: "27831234567",
+			errMsg:NumberManager.ErrorMissingPartialPrefix,
+		},
 	}
 
 	for name, tc := range tests {
@@ -61,18 +73,25 @@ func TestReplacePrefix(t *testing.T) {
 			expected: NumberManager.RightPrefix + "1234567",
 			errMsg:   NumberManager.ErrorWrongPrefix,
 		},
+		"NotReplacePrefix": {
+			hasError: false,
+			input:    "27831234567",
+			expected: NumberManager.RightPrefix + "1234567",
+			errMsg:   "",
+		},
 		"ErrorLessThanPrefixLength": {
 			hasError: true,
 			input:    "123",
-			expected: NumberManager.RightPrefix + "123",
+			expected: "",
 			errMsg:   NumberManager.ErrMsgLessThanCore,
 		},
 		"ErrorLessThanCoreLength": {
 			hasError: true,
 			input:    "123456",
-			expected: NumberManager.RightPrefix + "123456",
+			expected: "",
 			errMsg:   NumberManager.ErrMsgLessThanCore,
 		},
+
 	}
 
 	for name, tc := range tests {

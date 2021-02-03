@@ -1,20 +1,9 @@
 package NumberManager
 
 import (
-	"github.com/pkg/errors"
 	"log"
 	"regexp"
 )
-
-const CoreLen int = 7
-const prefixLen int = 4
-const RightPrefix string = "2783"
-
-type NumberType string
-
-const ValidFirstAttempt NumberType = "ValidFirstAttempt"
-const InvalidCritical NumberType = "InvalidCritical"
-const InvalidButFixable NumberType = "InvalidButFixable"
 
 type Row struct {
 	Original string
@@ -42,30 +31,20 @@ func New(fullNumber string) *Row {
 	return &r
 }
 
-func IsRightFormat(number string) bool {
-	if len(number) != prefixLen+CoreLen {
-		return false
-	}
-	matchedRegex, err := regexp.MatchString(RightPrefix+"[0-9]{7}", number)
-	if err != nil {
-		err = errors.Wrap(err, "fatal occurred during regexp matching")
-		log.Fatal(err)
-	}
-	return matchedRegex
-}
 
-func TrimNotNumbersDigitWithError(input string) (string, error) {
-	onlyNumberRegex, err := regexp.Compile("[^0-9]+")
+// HasNotNumberDigits verify if not number digits is present
+// used despite of integer conversion check because the max was 4294967295
+// If get and error during regex compile, it exit with fatal
+func HasNotNumberDigits(number string) bool {
+	hasNumberRegex, err := regexp.Compile("[^0-9]+")
 	if err != nil {
 		log.Fatal(err)
 	}
-	out := onlyNumberRegex.ReplaceAllString(input, "")
-	if out != input {
-		return out, errors.New(ErrorNotNumericDigits)
-	}
-	return input, nil
+	return hasNumberRegex.MatchString(number)
 }
 
+// TrimNotNumbersDigit remove all not numeric digits
+// If get and error during regex compile, it exit with fatal
 func TrimNotNumbersDigit(input string) string {
 	onlyNumberRegex, err := regexp.Compile("[^0-9]+")
 	if err != nil {

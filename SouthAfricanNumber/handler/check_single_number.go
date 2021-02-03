@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
 	"github.com/pkg/errors"
+	"log"
 	"net/http"
 )
 
@@ -24,5 +25,8 @@ func Check(w http.ResponseWriter, number string) {
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	w.Write(out)
+	_,err = w.Write(out)
+	if err != nil {
+		log.Printf("error on write: %v",err)
+	}
 }
