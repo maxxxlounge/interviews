@@ -30,8 +30,13 @@ libraries for the heavy lifting is permitted. If you do use a database, please i
 Conclusion:
 Be creative and have loads of fun, project shouldn't take much longer than a couple of hours,
 we are not looking for perfection, just an insight into how you work.
-
 -
+
+## RUN PROJECT
+
+```sh
+
+```
 
 ## DEPLOYMENT STRATEGY
 
@@ -45,7 +50,7 @@ the 7 digit after prefix is called the "core" part
 
 | param | default | description |
 |---|---|---|
-|-p | "8888" | listen port |
+|-p | "80" | listen port |
 |-i | "input.csv" | input source file |
 |-d | "output.json" | destination file (json) |
 

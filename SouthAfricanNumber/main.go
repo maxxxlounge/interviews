@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
 	"github.com/pkg/errors"
@@ -15,10 +16,20 @@ import (
 	"time"
 )
 
+func title(){
+	fmt.Println()
+	fmt.Println(`======================= `)
+	fmt.Println(` SOUTH AFRICAN NUMBERS `)
+	fmt.Println(`======================= `)
+	fmt.Println()
+}
+
 func main() {
+	title()
+
 	var fileSource = flag.String("i", "input.csv", "-i input source file")
 	var storeFile = flag.String("d", "output.json", "-d destination file (json)")
-	var port = flag.String("p", "8888", "-p listen port")
+	var port = flag.String("p", "80", "-p listen port")
 	flag.Parse()
 
 	l := log.New()

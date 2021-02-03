@@ -56,7 +56,13 @@
                             dataType:"json",
                             url:url,
                             success: function (data) {
+                                var resp = data.responseJSON;
+                                if (!resp){
+                                    $('#errors').append('<div class="alert alert-danger">' + data.responseText + '</div>');
+                                    return;
+                                }
                                 $('#original').text(resp.Original);
+                                $('#errors').append('<div class="alert alert-success">no errors, is a valid number</div>');
                             },
                             error: function (data) {
                                 var resp = data.responseJSON;
