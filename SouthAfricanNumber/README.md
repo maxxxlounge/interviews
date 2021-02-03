@@ -35,7 +35,7 @@ we are not looking for perfection, just an insight into how you work.
 ## RUN PROJECT
 
 ```sh
-
+./run.sh
 ```
 
 ## DEPLOYMENT STRATEGY
