@@ -44,42 +44,44 @@
         $(function() {
             $("#btn_number_check").click( function()
                 {
-                    $('#original').text("");
-                    $('#changed').text("");
-                    $('#errors').empty();
-                    var searchParam = $('#number_input').val();
-                    if (searchParam == undefined){
-                        searchParam="";
-                    }
-                    url = "/numbers/check?number=" + searchParam;
-                    $.ajax({
-                            dataType:"json",
-                            url:url,
-                            async:false,
-                            success: function (data) {
-                                console.log(data);
-                                console.log(data.Original);
-                                if (!data){
-                                    $('#errors').append('<div class="alert alert-danger">' + data + '</div>');
-                                    return;
-                                }
-                                $('#original').text(data.Original);
-                                $('#errors').append('<div class="alert alert-success">no errors, it is a valid number</div>');
-                            },
-                            error: function (data) {
-                                var resp = data.responseJSON;
-                                if (!resp){
-                                    $('#errors').append('<div class="alert alert-danger">' + data.responseText + '</div>');
-                                    return;
-                                }
-                                $('#original').text(resp.Original);
-                                $('#changed').text(resp.Changed);
-                                resp.Errors.forEach(function(err){
-                                    $('#errors').append('<div class="alert alert-danger">' + err + '</div>');
-                                });
-                            },
+                    try{
+                        $('#original').text("");
+                        $('#changed').text("");
+                        $('#errors').empty();
+                        var searchParam = $('#number_input').val();
+                        if (searchParam == undefined){
+                            searchParam="";
                         }
-                    )
+                        url = "/numbers/check?number=" + searchParam;
+                        $.ajax({
+                                dataType:"json",
+                                url:url,
+                                async:false,
+                                success: function (data) {
+                                    if (!data){
+                                        $('#errors').append('<div class="alert alert-danger">error contacting server</div>');
+                                        return;
+                                    }
+                                    $('#original').text(data.Original);
+                                    $('#errors').append('<div class="alert alert-success">no errors, it is a valid number</div>');
+                                },
+                                error: function (data) {
+                                    var resp = data.responseJSON;
+                                    if (!resp){
+                                        $('#errors').append('<div class="alert alert-danger">error contacting server</div>');
+                                        return;
+                                    }
+                                    $('#original').text(resp.Original);
+                                    $('#changed').text(resp.Changed);
+                                    resp.Errors.forEach(function(err){
+                                        $('#errors').append('<div class="alert alert-danger">' + err + '</div>');
+                                    });
+                                },
+                            }
+                        )
+                    } catch(err){
+                        console.error(err.message);
+                    }
                 }
             );
         });

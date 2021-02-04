@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func title(){
+func title() {
 	fmt.Println()
 	fmt.Println(`======================= `)
 	fmt.Println(` SOUTH AFRICAN NUMBERS `)
