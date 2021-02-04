@@ -9,8 +9,8 @@ import (
 )
 
 func TestFindCriticalError(t *testing.T) {
-	var errLessThanPrefix = fmt.Sprintf(numbermanager.ErrMsgLessThanPrefix, numbermanager.RightPrefix)
-	var errLessThanCore = fmt.Sprintf(numbermanager.ErrMsgLessThanCore, numbermanager.CoreLen)
+	errLessThanPrefix := fmt.Sprintf(numbermanager.ErrMsgLessThanPrefix, numbermanager.RightPrefix)
+	errLessThanCore := fmt.Sprintf(numbermanager.ErrMsgLessThanCore, numbermanager.CoreLen)
 
 	tests := map[string]struct {
 		input    string
@@ -82,5 +82,4 @@ func TestFindCriticalError(t *testing.T) {
 			}
 		})
 	}
-
 }

@@ -28,14 +28,15 @@ func title() {
 func main() {
 	title()
 
-	var fileSource = flag.String("i", "input.csv", "-i input source file")
-	var storeFile = flag.String("d", "output.json", "-d destination file (json)")
-	var port = flag.String("p", "80", "-p listen port")
+	fileSource := flag.String("i", "input.csv", "-i input source file")
+	storeFile := flag.String("d", "output.json", "-d destination file (json)")
+	port := flag.String("p", "80", "-p listen port")
 	flag.Parse()
 
 	l := log.New()
 	reader, err := os.Open(*fileSource)
 	DieOnErr(err)
+
 	defer reader.Close()
 
 	validNumbers := make(map[string]*numbermanager.Row)
@@ -51,11 +52,13 @@ func main() {
 		l.Fatal(err)
 	}
 	rowindex := 0
+
 	for {
 		record, err := r.Read()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
+
 		DieOnErr(err)
 
 		// 	prevent missing columns
@@ -72,7 +75,9 @@ func main() {
 		loadedNumbers[record[0]] = row
 		rowindex++
 	}
+
 	l.Info("processing numbers...")
+
 	for k, v := range loadedNumbers {
 		switch v.Type {
 		case numbermanager.ValidFirstAttempt:
@@ -81,6 +86,9 @@ func main() {
 			criticalNumbers[k] = v
 		case numbermanager.InvalidButFixable:
 			fixableNumbers[k] = v
+		case numbermanager.NotEvaluated:
+		default:
+			continue
 		}
 	}
 
@@ -93,6 +101,7 @@ func main() {
 	log.Infof("Counter Sum  %v\n", len(criticalNumbers)+len(fixableNumbers)+len(validNumbers))
 
 	var h http.Handler
+
 	http.HandleFunc("/numbers", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		p := r.URL.Query().Get("type")
@@ -107,6 +116,7 @@ func main() {
 			handler.ShowNumbers(w, loadedNumbers)
 		}
 	})
+
 	http.HandleFunc("/numbers/check", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin:", "*")
 		w.Header().Add("Content-Type", "application/json")
@@ -115,7 +125,9 @@ func main() {
 	})
 
 	fs := http.FileServer(http.Dir("./public"))
+
 	http.Handle("/", fs)
+
 	s := &http.Server{
 		Addr:           ":" + *port,
 		Handler:        h,
@@ -123,13 +135,16 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+
 	l.Infof("saving data on '%s ", *storeFile)
+
 	err = Store(loadedNumbers, *storeFile)
 	if err != nil {
 		// not die because the service still up
 		err = errors.Wrap(err, "error storing data on file")
 		log.Warn(err)
 	}
+
 	l.Infof("starting endpoint on port :%s", *port)
 	l.Fatal(s.ListenAndServe())
 }
@@ -140,16 +155,20 @@ func Store(m map[string]*numbermanager.Row, filepath string) error {
 		return err
 	}
 	defer f.Close()
+
 	w := bufio.NewWriter(f)
 	out, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}
+
 	_, err = w.Write(out)
+
 	if err != nil {
 		return err
 	}
 	w.Flush()
+
 	return nil
 }
 

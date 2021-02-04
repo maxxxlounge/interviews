@@ -12,6 +12,7 @@ import (
 func Check(w http.ResponseWriter, number string) {
 	if number == "" {
 		http.Error(w, "missing number", http.StatusBadRequest)
+
 		return
 	}
 	row := numbermanager.New(number)
@@ -19,6 +20,7 @@ func Check(w http.ResponseWriter, number string) {
 	if err != nil {
 		err = errors.Wrap(err, "error marshalling number information to JSON")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 	if row.Type == numbermanager.ValidFirstAttempt {

@@ -44,7 +44,6 @@ func TestFindFixableError(t *testing.T) {
 			for _, expectedError := range tc.expectedErrMsg {
 				assert.Contains(t, ee, expectedError)
 			}
-
 		})
 	}
 }

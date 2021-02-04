@@ -99,30 +99,29 @@ func TestCheck(t *testing.T) {
 			assert.EqualValues(t, *tc.Row, r)
 		})
 	}
-
 }
 
 func TestShowNumbers(t *testing.T) {
 	testMap := map[string]*numbermanager.Row{
-		"123123": &numbermanager.Row{
+		"123123": {
 			Original: "1234567",
 			Changed:  "27831234567",
 			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
 			Type:     numbermanager.InvalidCritical,
 		},
-		"1231234": &numbermanager.Row{
+		"1231234": {
 			Original: "12341234567",
 			Changed:  "27831234567",
 			Errors:   []string{numbermanager.ErrorWrongPrefix},
 			Type:     numbermanager.InvalidCritical,
 		},
-		"1231233": &numbermanager.Row{
+		"1231233": {
 			Original: "1234567",
 			Changed:  "27831234567",
 			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
 			Type:     numbermanager.InvalidButFixable,
 		},
-		"12131233": &numbermanager.Row{
+		"12131233": {
 			Original: "1234567",
 			Changed:  "27831234567",
 			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
@@ -156,7 +155,7 @@ func TestShowNumbers(t *testing.T) {
 		},
 		"InvalidButFixable": {
 			numberListMap: map[string]*numbermanager.Row{
-				"123123": &numbermanager.Row{
+				"123123": {
 					Original: "1234567",
 					Changed:  "27831234567",
 					Errors:   nil,
@@ -181,5 +180,4 @@ func TestShowNumbers(t *testing.T) {
 			assert.EqualValues(t, tc.numberListMap, returnedMapList)
 		})
 	}
-
 }

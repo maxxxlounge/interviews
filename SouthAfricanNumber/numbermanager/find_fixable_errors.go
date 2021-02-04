@@ -1,8 +1,8 @@
 package numbermanager
 
 /**
-FindFixableError process record and give errors and fix suggestion
-number is the given string
+FindFixableError process record and give errors and fix suggestion.
+number is the given string.
 */
 func FindFixableError(number string) ([]string, string) {
 	var (
@@ -32,5 +32,6 @@ func FindFixableError(number string) ([]string, string) {
 	if err != nil {
 		errs = append(errs, err.Error())
 	}
+
 	return errs, changed
 }
