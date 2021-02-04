@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
 	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/numbermanager"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,14 +16,14 @@ import (
 var response []byte
 
 type mockWriter struct {
-	HttpHeaderResponse http.Header
+	HTTPHeaderResponse http.Header
 	WriteResponseCode  int
 	Error              error
 	HeaderCode         int
 }
 
 func (m mockWriter) Header() http.Header {
-	return m.HttpHeaderResponse
+	return m.HTTPHeaderResponse
 }
 
 func (m mockWriter) Write(resp []byte) (int, error) {
@@ -32,7 +32,7 @@ func (m mockWriter) Write(resp []byte) (int, error) {
 }
 
 func (m mockWriter) WriteHeader(statusCode int) {
-	m.HttpHeaderResponse["status"] = []string{fmt.Sprintf("%v", statusCode)}
+	m.HTTPHeaderResponse["status"] = []string{fmt.Sprintf("%v", statusCode)}
 }
 
 func TestCheck(t *testing.T) {
@@ -40,12 +40,12 @@ func TestCheck(t *testing.T) {
 		writer             mockWriter
 		expectedHeaderCode int
 		number             string
-		Row                *NumberManager.Row
+		Row                *numbermanager.Row
 	}{
 		"EmptyNumber": {
 			number: "",
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
@@ -55,31 +55,31 @@ func TestCheck(t *testing.T) {
 		"NumberOK": {
 			number: "27831234567",
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
 			expectedHeaderCode: http.StatusOK,
-			Row: &NumberManager.Row{
+			Row: &numbermanager.Row{
 				Original: "27831234567",
 				Changed:  "",
 				Errors:   nil,
-				Type:     NumberManager.ValidFirstAttempt,
+				Type:     numbermanager.ValidFirstAttempt,
 			},
 		},
 		"NumberKO": {
 			number: "278312345671",
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
 			expectedHeaderCode: http.StatusBadRequest,
-			Row: &NumberManager.Row{
+			Row: &numbermanager.Row{
 				Original: "278312345671",
 				Changed:  "27831234567",
-				Errors:   []string{NumberManager.ErrorCutExtraDigits},
-				Type:     NumberManager.InvalidButFixable,
+				Errors:   []string{numbermanager.ErrorCutExtraDigits},
+				Type:     numbermanager.InvalidButFixable,
 			},
 		},
 	}
@@ -87,13 +87,13 @@ func TestCheck(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			handler.Check(tc.writer, tc.number)
-			status, err := strconv.Atoi(tc.writer.HttpHeaderResponse["status"][0])
+			status, err := strconv.Atoi(tc.writer.HTTPHeaderResponse["status"][0])
 			require.Nil(t, err)
 			assert.Equal(t, tc.expectedHeaderCode, status)
 			if tc.Row == nil {
 				return
 			}
-			r := NumberManager.Row{}
+			r := numbermanager.Row{}
 			err = json.Unmarshal(response, &r)
 			require.Nil(t, err)
 			assert.EqualValues(t, *tc.Row, r)
@@ -103,30 +103,30 @@ func TestCheck(t *testing.T) {
 }
 
 func TestShowNumbers(t *testing.T) {
-	testMap := map[string]*NumberManager.Row{
-		"123123": &NumberManager.Row{
+	testMap := map[string]*numbermanager.Row{
+		"123123": &numbermanager.Row{
 			Original: "1234567",
 			Changed:  "27831234567",
-			Errors:   []string{NumberManager.ErrorMissingPartialPrefix},
-			Type:     NumberManager.InvalidCritical,
+			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
+			Type:     numbermanager.InvalidCritical,
 		},
-		"1231234": &NumberManager.Row{
+		"1231234": &numbermanager.Row{
 			Original: "12341234567",
 			Changed:  "27831234567",
-			Errors:   []string{NumberManager.ErrorWrongPrefix},
-			Type:     NumberManager.InvalidCritical,
+			Errors:   []string{numbermanager.ErrorWrongPrefix},
+			Type:     numbermanager.InvalidCritical,
 		},
-		"1231233": &NumberManager.Row{
+		"1231233": &numbermanager.Row{
 			Original: "1234567",
 			Changed:  "27831234567",
-			Errors:   []string{NumberManager.ErrorMissingPartialPrefix},
-			Type:     NumberManager.InvalidButFixable,
+			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
+			Type:     numbermanager.InvalidButFixable,
 		},
-		"12131233": &NumberManager.Row{
+		"12131233": &numbermanager.Row{
 			Original: "1234567",
 			Changed:  "27831234567",
-			Errors:   []string{NumberManager.ErrorMissingPartialPrefix},
-			Type:     NumberManager.ValidFirstAttempt,
+			Errors:   []string{numbermanager.ErrorMissingPartialPrefix},
+			Type:     numbermanager.ValidFirstAttempt,
 		},
 	}
 
@@ -134,12 +134,12 @@ func TestShowNumbers(t *testing.T) {
 		hasError           bool
 		writer             mockWriter
 		expectedHeaderCode int
-		numberListMap      map[string]*NumberManager.Row
+		numberListMap      map[string]*numbermanager.Row
 	}{
 		"UnmarshalError": {
 			numberListMap: nil,
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
@@ -148,23 +148,23 @@ func TestShowNumbers(t *testing.T) {
 		"AllNumbers": {
 			numberListMap: testMap,
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
 			expectedHeaderCode: http.StatusBadRequest,
 		},
 		"InvalidButFixable": {
-			numberListMap: map[string]*NumberManager.Row{
-				"123123": &NumberManager.Row{
+			numberListMap: map[string]*numbermanager.Row{
+				"123123": &numbermanager.Row{
 					Original: "1234567",
 					Changed:  "27831234567",
 					Errors:   nil,
-					Type:     NumberManager.InvalidButFixable,
+					Type:     numbermanager.InvalidButFixable,
 				},
 			},
 			writer: mockWriter{
-				HttpHeaderResponse: http.Header{},
+				HTTPHeaderResponse: http.Header{},
 				WriteResponseCode:  http.StatusOK,
 				Error:              nil,
 			},
@@ -175,7 +175,7 @@ func TestShowNumbers(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			handler.ShowNumbers(tc.writer, tc.numberListMap)
-			returnedMapList := make(map[string]*NumberManager.Row)
+			returnedMapList := make(map[string]*numbermanager.Row)
 			err := json.Unmarshal(response, &returnedMapList)
 			require.Nil(t, err)
 			assert.EqualValues(t, tc.numberListMap, returnedMapList)

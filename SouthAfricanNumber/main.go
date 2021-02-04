@@ -6,14 +6,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
-	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/handler"
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/numbermanager"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func title() {
@@ -37,14 +38,14 @@ func main() {
 	DieOnErr(err)
 	defer reader.Close()
 
-	validNumbers := make(map[string]*NumberManager.Row)
-	loadedNumbers := make(map[string]*NumberManager.Row)
-	criticalNumbers := make(map[string]*NumberManager.Row)
-	fixableNumbers := make(map[string]*NumberManager.Row)
+	validNumbers := make(map[string]*numbermanager.Row)
+	loadedNumbers := make(map[string]*numbermanager.Row)
+	criticalNumbers := make(map[string]*numbermanager.Row)
+	fixableNumbers := make(map[string]*numbermanager.Row)
 
 	l.Info("loading csv file")
 	r := csv.NewReader(reader)
-	//remove header
+	// remove header
 	_, err = r.Read()
 	if err != nil {
 		l.Fatal(err)
@@ -57,29 +58,28 @@ func main() {
 		}
 		DieOnErr(err)
 
-		//prevent missing columns
+		// 	prevent missing columns
 		if len(record) < 2 {
 			DieOnErr(errors.Errorf("bad input file format, missing column at line %v", rowindex))
 		}
 
 		// prevent duplicated index
 		if _, ok := loadedNumbers[record[0]]; ok {
-			log.Fatalf("duplicated index '%v' on row '%v' ", record[0], rowindex)
+			l.Fatalf("duplicated index '%v' on row '%v' ", record[0], rowindex)
 		}
 
-		row := NumberManager.New(record[1])
+		row := numbermanager.New(record[1])
 		loadedNumbers[record[0]] = row
 		rowindex++
 	}
 	l.Info("processing numbers...")
-
 	for k, v := range loadedNumbers {
 		switch v.Type {
-		case NumberManager.ValidFirstAttempt:
+		case numbermanager.ValidFirstAttempt:
 			validNumbers[k] = v
-		case NumberManager.InvalidCritical:
+		case numbermanager.InvalidCritical:
 			criticalNumbers[k] = v
-		case NumberManager.InvalidButFixable:
+		case numbermanager.InvalidButFixable:
 			fixableNumbers[k] = v
 		}
 	}
@@ -131,10 +131,10 @@ func main() {
 		log.Warn(err)
 	}
 	l.Infof("starting endpoint on port :%s", *port)
-	log.Fatal(s.ListenAndServe())
+	l.Fatal(s.ListenAndServe())
 }
 
-func Store(m map[string]*NumberManager.Row, filepath string) error {
+func Store(m map[string]*numbermanager.Row, filepath string) error {
 	f, err := os.Create(filepath)
 	if err != nil {
 		return err

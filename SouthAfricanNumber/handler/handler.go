@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/maxxxlounge/interviews/SouthAfricanNumber/NumberManager"
-	"github.com/pkg/errors"
 	"log"
 	"net/http"
+
+	"github.com/maxxxlounge/interviews/SouthAfricanNumber/numbermanager"
+	"github.com/pkg/errors"
 )
 
 func Check(w http.ResponseWriter, number string) {
@@ -13,14 +14,14 @@ func Check(w http.ResponseWriter, number string) {
 		http.Error(w, "missing number", http.StatusBadRequest)
 		return
 	}
-	row := NumberManager.New(number)
+	row := numbermanager.New(number)
 	out, err := json.Marshal(row)
 	if err != nil {
 		err = errors.Wrap(err, "error marshalling number information to JSON")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if row.Type == NumberManager.ValidFirstAttempt {
+	if row.Type == numbermanager.ValidFirstAttempt {
 		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
@@ -31,7 +32,7 @@ func Check(w http.ResponseWriter, number string) {
 	}
 }
 
-func ShowNumbers(w http.ResponseWriter, numberlist map[string]*NumberManager.Row) {
+func ShowNumbers(w http.ResponseWriter, numberlist map[string]*numbermanager.Row) {
 	out, err := json.Marshal(numberlist)
 	if err != nil {
 		err = errors.Wrap(err, "error marshalling list to JSON")
