@@ -55,14 +55,16 @@
                     $.ajax({
                             dataType:"json",
                             url:url,
+                            async:false,
                             success: function (data) {
-                                var resp = data.responseJSON;
-                                if (!resp){
-                                    $('#errors').append('<div class="alert alert-danger">' + data.responseText + '</div>');
+                                console.log(data);
+                                console.log(data.Original);
+                                if (!data){
+                                    $('#errors').append('<div class="alert alert-danger">' + data + '</div>');
                                     return;
                                 }
-                                $('#original').text(resp.Original);
-                                $('#errors').append('<div class="alert alert-success">no errors, is a valid number</div>');
+                                $('#original').text(data.Original);
+                                $('#errors').append('<div class="alert alert-success">no errors, it is a valid number</div>');
                             },
                             error: function (data) {
                                 var resp = data.responseJSON;
