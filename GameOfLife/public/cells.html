@@ -28,8 +28,20 @@
                 <h1>Conway's Game of Life.</h1>
             </div>
         </div>
-        <button id="btn_number_check" type="button" class="btn btn-lg btn-primary">Check</button>
+        <div class="row">
+            <div class="col-3">
+        <input type="text" class="form-control" id="width" placeholder="">
+            </div>
+            <div class="col-3">
+        <input type="text" class="form-control" id="height" placeholder="">
+            </div>
+            <div class="col-2">
+        <button id="generate" type="button" class="btn btn-lg btn-primary">Generate</button>
+            </div>
+        </div>
+        <div id="errors"></div>
         <div id="cells"></div>
+
     </div>
     <script type="application/javascript">
 
@@ -54,15 +66,9 @@
                                     $('#cells').append('<div class="clearfix"></div>');
                                 }
                             })
-
-
                         },
-                        error: function (data) {
-                            var resp = data.responseJSON;
-                            if (!resp){
-                                $('#errors').append('<div class="alert alert-danger">error contacting server</div>');
-                                return;
-                            }
+                        error: function (data,err) {
+                            console.error(data)
                         },
                     }
                 )
@@ -71,8 +77,34 @@
             }
         }
 
+        function Regenerate(){
+            url = "/cells/generate";
+            $.ajax({
+                method: "POST",
+                url:url,
+                async:false,
+                data: JSON.stringify({
+                    "width": $('#width').val(),
+                    "height": $('#height').val()
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (!data){
+                        $('#errors').append('<div class="alert alert-success">' + err.message + '</div>');
+                        return;
+                    }
+                },
+                error: function (data) {
+                        $('#errors').append('<div class="alert alert-danger close">' + data.responseText + '</div>');
+                        return;
+                },
+            });
+        }
+
         $(function() {
             setInterval(Update, 1000);
+            $('#generate').click(Regenerate);
         });
     </script>
 </body>
