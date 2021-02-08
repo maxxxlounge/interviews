@@ -2,77 +2,53 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/maxxxlounge/interviews/GameOfLife/game"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"net/http"
+	"time"
 )
 
+func main() {
+	l := log.New()
 
-func main(){
-	cells:=GenerateCells(10,10)
-	out,err := json.Marshal(cells)
-	if err != nil {
-		log.Fatal(err)
+	tickTime := 1 * time.Second
+	g := game.NewGame(100, 100)
+	g.Generate()
+	go func(g *game.Game) {
+		for {
+			g.Tick()
+			time.Sleep(tickTime)
+		}
+	}(g)
+
+	var h http.Handler
+
+	http.HandleFunc("/cells", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		out, err := json.Marshal(g)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(out)
+	})
+
+	http.HandleFunc("/cells/generate", func(w http.ResponseWriter, r *http.Request) {
+		g.Generate()
+	})
+
+	fs := http.FileServer(http.Dir("./public"))
+	http.Handle("/", fs)
+
+	s := &http.Server{
+		Addr:           ":8888",
+		Handler:        h,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
-	for i,c := range cells{
-		fmt.Printf("%v %v" + " " + c.Status)
-	}
-
+	l.Infof("starting endpoint on port :8888")
+	l.Fatal(s.ListenAndServe())
 }
 
-func GenerateCells(width, height int) ([]*game.Cell){
-	var (
-		cells []*game.Cell
-		prevCell *game.Cell
-	)
-	for hi := 0; hi < height; hi++{
-		for wi := 0; wi < width; wi++{
-			c := game.NewCell()
-			cells = append(cells,c)
-			if wi % height == 0 {
-				c.Cells[game.Left] = nil
-				c.Cells[game.LeftTop] = nil
-			}
-			if prevCell != nil {
-				prevCell.Cells[game.Right]=c
-			}
-			if i%height==0{
-				c.Cells[game.Top] = nil
-			}else{
-				prevCell.Cells[game.Bottom]=c
-			}
-
-			if i%width == 0 && i&height ==0{
-				c.Cells[game.LeftTop] = nil
-			}else {
-				prevCell.Cells[game.RightBottom] = c
-			}
-			prevCell = c
-		}
-	}
-
-
-	for i := 0; i < totalCell; i++{
-		c := game.NewCell()
-		cells = append(cells,c)
-		if i % width == 0 {
-			c.Cells[game.Left] = nil
-		}else{
-			prevCell.Cells[game.Right]=c
-		}
-		if i%height==0{
-			c.Cells[game.Top] = nil
-		}else{
-			prevCell.Cells[game.Bottom]=c
-		}
-
-		if i%width == 0 && i&height ==0{
-			c.Cells[game.LeftTop] = nil
-		}else {
-			prevCell.Cells[game.RightBottom] = c
-		}
-		prevCell = c
-	}
-	return cells
-}

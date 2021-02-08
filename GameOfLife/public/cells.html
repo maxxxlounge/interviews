@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Conway's Game of Life</title>
+    <script type="application/javascript" src="jquery-3.5.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <style type="text/css">
+        .cell {
+            width: 10px;
+            height: 10px;
+            margin: 1px;
+            float :left;
+        }
+        .livetrue{
+          background: aqua;
+        }
+        .livefalse{
+            background: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Conway's Game of Life.</h1>
+            </div>
+        </div>
+        <button id="btn_number_check" type="button" class="btn btn-lg btn-primary">Check</button>
+        <div id="cells"></div>
+    </div>
+    <script type="application/javascript">
+
+        function Update() {
+            try{
+                $('#cells').empty();
+                url = "/cells";
+                $.ajax({
+                        dataType:"json",
+                        url:url,
+                        async:false,
+                        success: function (data) {
+                            if (!data){
+                                $('#errors').append('<div class="alert alert-danger">error contacting server</div>');
+                                return;
+                            }
+                            var index = 0;
+                            data.Grid.forEach(function(e) {
+                                $('#cells').append('<div class="cell live' + e.Status + '"></div>');
+                                index +=1;
+                                if (index % data.Width == 0) {
+                                    $('#cells').append('<div class="clearfix"></div>');
+                                }
+                            })
+
+
+                        },
+                        error: function (data) {
+                            var resp = data.responseJSON;
+                            if (!resp){
+                                $('#errors').append('<div class="alert alert-danger">error contacting server</div>');
+                                return;
+                            }
+                        },
+                    }
+                )
+            } catch(err){
+                console.error(err.message);
+            }
+        }
+
+        $(function() {
+            setInterval(Update, 1000);
+        });
+    </script>
+</body>
+</html>
