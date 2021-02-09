@@ -3,6 +3,9 @@ package game
 var ErrMsgNilCellAtLeft = "Nil cell at left, impossible to retrieve other references"
 var ErrMsgNilCellAtTop = "Nil cell at top, impossible to retrieve other references"
 
+
+// SetupReference is the main cell reference setup function
+// get the left reference cell and setup the relative reference for actual cell
 func (c *Cell) SetupReference() {
 	if c.Cells[Left] == nil {
 		return

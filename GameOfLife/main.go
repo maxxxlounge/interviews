@@ -26,6 +26,7 @@ func main() {
 
 	var h http.Handler
 
+	// return the cells json
 	http.HandleFunc("/cells", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "can't get resource using not GET method", http.StatusBadRequest)
@@ -40,6 +41,7 @@ func main() {
 		w.Write(out)
 	})
 
+	// generate new grid with width height given
 	http.HandleFunc("/cells/generate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "can't change resorce using not POST method", http.StatusBadRequest)

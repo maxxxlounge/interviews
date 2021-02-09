@@ -90,11 +90,10 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
-
+                    console.log("new grid generated");
                 },
                 error: function (data) {
-                        $('#errors').append('<div class="alert alert-danger close">' + data.responseText + '</div>');
-                        return;
+                    console.warn(data.responseText);
                 },
             });
         }

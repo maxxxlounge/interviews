@@ -55,6 +55,9 @@ func NewGame(width, height int) *Game {
 	return g
 }
 
+
+// Generate Provide all necessary action to generate game grid
+// return error if mix seed error occurred
 func (g *Game) Generate() error {
 	g.Grid = GenerateCells(g.Width, g.Height)
 	err := g.MixSeed()
@@ -66,6 +69,7 @@ func (g *Game) Generate() error {
 
 // FirstMixSeed mix the cell status
 // The first generation is created by applying the above rules simultaneously to every cell in the seed; births and deaths occur simultaneously,
+// error if 0 grid occurred
 func (g *Game) MixSeed() error {
 	if len(g.Grid) == 0 {
 		return errors.New("empty game Grid")
@@ -74,11 +78,11 @@ func (g *Game) MixSeed() error {
 	for _, c := range g.Grid {
 		wg.Add(2)
 		go func(c *Cell, wg *sync.WaitGroup) {
-			c.Status = true
+			c.Status = false
 			defer wg.Done()
 		}(c, wg)
 		go func(c *Cell, wg *sync.WaitGroup) {
-			c.Status = false
+			c.Status = true
 			defer wg.Done()
 		}(c, wg)
 	}
@@ -86,6 +90,8 @@ func (g *Game) MixSeed() error {
 	return nil
 }
 
+// Tick get next state form actual situation and store in a private nextStatus var,
+// when done: change all status at the same time
 func (g *Game) Tick() {
 	for _, c := range g.Grid {
 		c.nextStatus = c.GetNextState()
