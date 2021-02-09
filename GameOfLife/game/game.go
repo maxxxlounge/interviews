@@ -78,11 +78,11 @@ func (g *Game) MixSeed() error {
 	for _, c := range g.Grid {
 		wg.Add(2)
 		go func(c *Cell, wg *sync.WaitGroup) {
-			c.Status = false
+			c.Status = true
 			defer wg.Done()
 		}(c, wg)
 		go func(c *Cell, wg *sync.WaitGroup) {
-			c.Status = true
+			c.Status = false
 			defer wg.Done()
 		}(c, wg)
 	}

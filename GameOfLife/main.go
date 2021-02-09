@@ -14,8 +14,8 @@ import (
 func main() {
 	l := log.New()
 
-	tickTime := 1 * time.Second
-	g := game.NewGame(100, 100)
+	tickTime := 2 * time.Second
+	g := game.NewGame(50, 50)
 	g.Generate()
 	go func(g *game.Game) {
 		for {

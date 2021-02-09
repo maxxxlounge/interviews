@@ -96,10 +96,11 @@
                     console.warn(data.responseText);
                 },
             });
+            Update();
         }
 
         $(function() {
-            setInterval(Update, 1000);
+            setInterval(Update, 2000);
             $('#generate').click(Regenerate);
         });
     </script>
