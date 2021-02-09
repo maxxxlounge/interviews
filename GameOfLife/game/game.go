@@ -22,7 +22,7 @@ type Cell struct {
 	// need to identify and simplify tests
 	label      string
 	Status     bool
-	NextStatus bool
+	nextStatus bool
 	Cells      map[direction]*Cell `json:"-"`
 }
 
@@ -88,9 +88,9 @@ func (g *Game) MixSeed() error {
 
 func (g *Game) Tick() {
 	for _, c := range g.Grid {
-		c.NextStatus = c.GetNextState()
+		c.nextStatus = c.GetNextState()
 	}
 	for _, c := range g.Grid {
-		c.Status = c.NextStatus
+		c.Status = c.nextStatus
 	}
 }
