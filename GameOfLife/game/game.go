@@ -9,14 +9,16 @@ import (
 
 type direction string
 
-const Left = "left"
-const Right = "right"
-const Top = "top"
-const Bottom = "bottom"
-const LeftTop = "left_top"
-const LeftBottom = "left_bottom"
-const RightTop = "right_top"
-const RightBottom = "right_bottom"
+const (
+	Left        = "left"
+	Right       = "right"
+	Top         = "top"
+	Bottom      = "bottom"
+	LeftTop     = "left_top"
+	LeftBottom  = "left_bottom"
+	RightTop    = "right_top"
+	RightBottom = "right_bottom"
+)
 
 type Cell struct {
 	// need to identify and simplify tests
@@ -55,9 +57,8 @@ func NewGame(width, height int) *Game {
 	return g
 }
 
-
-// Generate Provide all necessary action to generate game grid
-// return error if mix seed error occurred
+// Generate Provide all necessary action to generate game grid.
+// return error if mix seed error occurred.
 func (g *Game) Generate() error {
 	g.Grid = GenerateCells(g.Width, g.Height)
 	err := g.MixSeed()
@@ -67,9 +68,9 @@ func (g *Game) Generate() error {
 	return nil
 }
 
-// FirstMixSeed mix the cell status
+// FirstMixSeed mix the cell status.
 // The first generation is created by applying the above rules simultaneously to every cell in the seed; births and deaths occur simultaneously,
-// error if 0 grid occurred
+// error if 0 grid occurred.
 func (g *Game) MixSeed() error {
 	if len(g.Grid) == 0 {
 		return errors.New("empty game Grid")
@@ -91,7 +92,7 @@ func (g *Game) MixSeed() error {
 }
 
 // Tick get next state form actual situation and store in a private nextStatus var,
-// when done: change all status at the same time
+// when done: change all status at the same time.
 func (g *Game) Tick() {
 	for _, c := range g.Grid {
 		c.nextStatus = c.GetNextState()

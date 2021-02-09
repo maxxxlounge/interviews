@@ -1,12 +1,12 @@
 package game
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCell_GetNextState(t *testing.T) {
-
 	tests := map[string]struct {
 		cell              *Cell
 		expectedNextState bool

@@ -1,9 +1,10 @@
 package game
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCell_SetupReference(t *testing.T) {
@@ -185,8 +186,6 @@ func TestCell_SetupReference(t *testing.T) {
 				assert.Equal(t, tc.expectedAroundCells[RightTop].label, c.Cells[RightTop].label)
 				assert.Equal(t, c.label, c.Cells[RightTop].Cells[LeftBottom].label)
 			}
-
 		})
 	}
-
 }

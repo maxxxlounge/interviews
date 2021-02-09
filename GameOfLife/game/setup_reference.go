@@ -1,8 +1,9 @@
 package game
 
-var ErrMsgNilCellAtLeft = "Nil cell at left, impossible to retrieve other references"
-var ErrMsgNilCellAtTop = "Nil cell at top, impossible to retrieve other references"
-
+var (
+	ErrMsgNilCellAtLeft = "Nil cell at left, impossible to retrieve other references"
+	ErrMsgNilCellAtTop  = "Nil cell at top, impossible to retrieve other references"
+)
 
 // SetupReference is the main cell reference setup function
 // get the left reference cell and setup the relative reference for actual cell
@@ -30,5 +31,4 @@ func (c *Cell) SetupReference() {
 			c.Cells[RightTop].Cells[LeftBottom] = c
 		}
 	}
-	return
 }

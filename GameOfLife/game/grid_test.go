@@ -2,8 +2,9 @@ package game
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateCells(t *testing.T) {
@@ -93,8 +94,6 @@ func TestGenerateCells(t *testing.T) {
 				}
 			}
 			// Check for other cases: row 2 start from index
-
 		})
 	}
-
 }

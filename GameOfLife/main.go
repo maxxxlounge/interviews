@@ -2,21 +2,28 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/maxxxlounge/interviews/GameOfLife/game"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/maxxxlounge/interviews/GameOfLife/game"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	l := log.New()
 
 	tickTime := 2 * time.Second
-	g := game.NewGame(50, 50)
-	g.Generate()
+	g := game.NewGame(100, 100)
+
+	err := g.Generate()
+	if err != nil {
+		err = errors.Wrap(err, "error generating first grid")
+		l.Fatal(err)
+	}
+
 	go func(g *game.Game) {
 		for {
 			g.Tick()
@@ -30,21 +37,28 @@ func main() {
 	http.HandleFunc("/cells", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "can't get resource using not GET method", http.StatusBadRequest)
+
 			return
 		}
 		w.Header().Add("Content-Type", "application/json")
 		out, err := json.Marshal(g)
 		if err != nil {
+			l.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+
 			return
 		}
-		w.Write(out)
+		_, err = w.Write(out)
+		if err != nil {
+			l.Error(err)
+		}
 	})
 
 	// generate new grid with width height given
 	http.HandleFunc("/cells/generate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "can't change resorce using not POST method", http.StatusBadRequest)
+
 			return
 		}
 		body, err := ioutil.ReadAll(r.Body)
@@ -62,25 +76,42 @@ func main() {
 		if err != nil {
 			l.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+
+		if gr.Width == "" || gr.Height == "" {
+			err = errors.New("empty width or height")
+			l.Error(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+
 			return
 		}
 
 		width, err := strconv.Atoi(gr.Width)
 		if err != nil {
-			errors.Wrap(err, "wrong width format")
+			err = errors.Wrap(err, "wrong width format")
+			l.Error(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
+
 			return
 		}
 		height, err := strconv.Atoi(gr.Height)
 		if err != nil {
-			errors.Wrap(err, "wrong height format")
+			err = errors.Wrap(err, "wrong height format")
+			l.Error(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
+
 			return
 		}
 
 		g.Width = width
 		g.Height = height
-		g.Generate()
+		err = g.Generate()
+		if err != nil {
+			err = errors.Wrap(err, "error generating grid")
+			l.Error(err)
+		}
 	})
 
 	fs := http.FileServer(http.Dir("./public"))

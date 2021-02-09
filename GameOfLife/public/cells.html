@@ -30,10 +30,10 @@
         </div>
         <div class="row">
             <div class="col-3">
-        <input type="text" class="form-control" id="width" placeholder="">
+        <input type="text" class="form-control" id="width" placeholder="50" value="50">
             </div>
             <div class="col-3">
-        <input type="text" class="form-control" id="height" placeholder="">
+        <input type="text" class="form-control" id="height" placeholder="50" value="50">
             </div>
             <div class="col-2">
         <button id="generate" type="button" class="btn btn-lg btn-primary">Generate</button>
@@ -93,7 +93,7 @@
                     console.log("new grid generated");
                 },
                 error: function (data) {
-                    console.warn(data.responseText);
+                    console.error(data.responseText);
                 },
             });
             Update();

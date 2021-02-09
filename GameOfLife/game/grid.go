@@ -4,7 +4,6 @@ import (
 	"fmt"
 )
 
-
 // GenerateCells provide the cells generation using setup reference method for cell and manage special border's case
 // return an array of cell reference
 func GenerateCells(width, height int) []*Cell {
