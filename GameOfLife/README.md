@@ -20,12 +20,26 @@ Each generation is a pure function of the preceding one.
 
 The rules continue to be applied repeatedly to create further generations.
 
+
+## Execution
+
+start on port 8888
+
+```sh
+    ./run.sh
+```
+
+## Endpoint
+
+ * GET /cells return the matrix and update every 1 second
+ * POST /cells/generate change resource with width and height, randomize matrix
+
 ## Deployment strategy
 
 Server rendering: go
 Every cell need to has pointer reference for near cells, current state and a function that get the next state
 
-output can be a json and rendered with a simple react application
+output can be a json (ordered for definitions) with a sequence of cell status and array and rendered with a simple react application
 
 
 

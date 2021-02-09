@@ -3,7 +3,7 @@ package game
 var ErrMsgNilCellAtLeft = "Nil cell at left, impossible to retrieve other references"
 var ErrMsgNilCellAtTop = "Nil cell at top, impossible to retrieve other references"
 
-func (c *Cell) SetupReference()  {
+func (c *Cell) SetupReference() {
 	if c.Cells[Left] == nil {
 		return
 	}

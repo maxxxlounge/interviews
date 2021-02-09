@@ -142,8 +142,8 @@ func TestCell_SetupReference(t *testing.T) {
 					label:  "HasLeftTopRightRight_LeftTopRight",
 				},
 				RightTop: {
-					Status:false,
-					label: "HasLeftTopRightRight_LeftTopRightRight",
+					Status: false,
+					label:  "HasLeftTopRightRight_LeftTopRightRight",
 				},
 			},
 			errMsg:   "",
@@ -163,10 +163,10 @@ func TestCell_SetupReference(t *testing.T) {
 			c.SetupReference()
 
 			if tc.expectedAroundCells[Left] == nil {
-				assert.Nil(t,c.Cells[Left],tc.expectedAroundCells[Left] )
+				assert.Nil(t, c.Cells[Left], tc.expectedAroundCells[Left])
 				return
 			}
-			require.NotNil(t,c.Cells[Left])
+			require.NotNil(t, c.Cells[Left])
 
 			if tc.expectedAroundCells[Left] != nil {
 				assert.Equal(t, tc.expectedAroundCells[Left].label, c.Cells[Left].label)

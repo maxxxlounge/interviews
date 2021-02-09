@@ -38,25 +38,25 @@ func TestGenerateCells(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			grid := GenerateCells(tc.width, tc.height)
 			assert.Equal(t, tc.width*tc.height, len(grid))
-			if len(grid) == 0{
+			if len(grid) == 0 {
 				return
 			}
 
-			for hi:=0;hi<tc.height;hi++ {
+			for hi := 0; hi < tc.height; hi++ {
 				for ci := 0; ci < tc.width; ci++ {
-					index := (hi*tc.width)+ci
+					index := (hi * tc.width) + ci
 
-					if hi>1 && hi < tc.height-1 && ci >1 && ci < tc.width-1 {
-						assert.NotNil(t,grid[index].Cells[LeftTop])
-						assert.NotNil(t,grid[index].Cells[LeftTop])
-						assert.NotNil(t,grid[index].Cells[RightTop])
-						assert.NotNil(t,grid[index].Cells[RightBottom])
-						assert.NotNil(t,grid[index].Cells[RightBottom])
-						assert.NotNil(t,grid[index].Cells[Bottom])
-						assert.NotNil(t,grid[index].Cells[LeftBottom])
+					if hi > 1 && hi < tc.height-1 && ci > 1 && ci < tc.width-1 {
+						assert.NotNil(t, grid[index].Cells[LeftTop])
+						assert.NotNil(t, grid[index].Cells[LeftTop])
+						assert.NotNil(t, grid[index].Cells[RightTop])
+						assert.NotNil(t, grid[index].Cells[RightBottom])
+						assert.NotNil(t, grid[index].Cells[RightBottom])
+						assert.NotNil(t, grid[index].Cells[Bottom])
+						assert.NotNil(t, grid[index].Cells[LeftBottom])
 					}
 
-					if hi == 0{
+					if hi == 0 {
 						assert.Nil(t, grid[index].Cells[Top])
 						assert.NotNil(t, grid[index].Cells[Bottom])
 					}
@@ -80,15 +80,15 @@ func TestGenerateCells(t *testing.T) {
 					}
 
 					/*
-					assert.Nil(t, Grid[index].Cells[Top])
-					assert.Nil(t, Grid[index].Cells[LeftTop])
-					assert.Nil(t, Grid[index].Cells[RightTop])
-					assert.Equal(t, Grid[index].Cells[Left], Grid[index-1])
-					assert.NotNil(t, Grid[index].Cells[Bottom])
-					assert.NotNil(t, Grid[index].Cells[Right])
-					assert.NotNil(t, Grid[index].Cells[RightBottom])
+						assert.Nil(t, Grid[index].Cells[Top])
+						assert.Nil(t, Grid[index].Cells[LeftTop])
+						assert.Nil(t, Grid[index].Cells[RightTop])
+						assert.Equal(t, Grid[index].Cells[Left], Grid[index-1])
+						assert.NotNil(t, Grid[index].Cells[Bottom])
+						assert.NotNil(t, Grid[index].Cells[Right])
+						assert.NotNil(t, Grid[index].Cells[RightBottom])
 
-					assert.Equal(t, Grid[index-1].Cells[Right], Grid[index])*/
+						assert.Equal(t, Grid[index-1].Cells[Right], Grid[index])*/
 
 				}
 			}

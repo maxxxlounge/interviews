@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func GenerateCells(width, height int) ([]*Cell) {
+func GenerateCells(width, height int) []*Cell {
 	var (
 		prevCell *Cell
 		// head and tail cell maintains a quick reference to start and ending cell

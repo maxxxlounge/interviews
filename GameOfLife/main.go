@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"github.com/maxxxlounge/interviews/GameOfLife/game"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
-	"github.com/pkg/errors"
 )
 
 func main() {
@@ -27,8 +27,8 @@ func main() {
 	var h http.Handler
 
 	http.HandleFunc("/cells", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet{
-			http.Error(w,"can't get resource using not GET method", http.StatusBadRequest)
+		if r.Method != http.MethodGet {
+			http.Error(w, "can't get resource using not GET method", http.StatusBadRequest)
 			return
 		}
 		w.Header().Add("Content-Type", "application/json")
@@ -42,7 +42,7 @@ func main() {
 
 	http.HandleFunc("/cells/generate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			http.Error(w,"can't change resorce using not POST method", http.StatusBadRequest)
+			http.Error(w, "can't change resorce using not POST method", http.StatusBadRequest)
 			return
 		}
 		body, err := ioutil.ReadAll(r.Body)
@@ -52,27 +52,27 @@ func main() {
 		}
 		l.Info(string(body))
 		type GenerateRequest struct {
-			Width string `json:"width"`
+			Width  string `json:"width"`
 			Height string `json:"height"`
 		}
 		gr := &GenerateRequest{}
-		err = json.Unmarshal(body,gr)
+		err = json.Unmarshal(body, gr)
 		if err != nil {
 			l.Error(err)
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		width,err := strconv.Atoi(gr.Width)
+		width, err := strconv.Atoi(gr.Width)
 		if err != nil {
-			errors.Wrap(err,"wrong width format")
-			http.Error(w,err.Error(),http.StatusBadRequest)
+			errors.Wrap(err, "wrong width format")
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		height,err := strconv.Atoi(gr.Height)
+		height, err := strconv.Atoi(gr.Height)
 		if err != nil {
-			errors.Wrap(err,"wrong height format")
-			http.Error(w,err.Error(),http.StatusBadRequest)
+			errors.Wrap(err, "wrong height format")
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -85,14 +85,13 @@ func main() {
 	http.Handle("/", fs)
 
 	s := &http.Server{
-		Addr:           ":8888",
+		Addr:           ":80",
 		Handler:        h,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	l.Infof("starting endpoint on port :8888")
+	l.Infof("starting endpoint on port :80")
 	l.Fatal(s.ListenAndServe())
 }
-

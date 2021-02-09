@@ -20,10 +20,10 @@ const RightBottom = "right_bottom"
 
 type Cell struct {
 	// need to identify and simplify tests
-	label  string
-	Status bool
+	label      string
+	Status     bool
 	NextStatus bool
-	Cells  map[direction]*Cell  `json:"-"`
+	Cells      map[direction]*Cell `json:"-"`
 }
 
 func NewCell() *Cell {
@@ -33,13 +33,13 @@ func NewCell() *Cell {
 	}
 }
 
-type Game struct{
+type Game struct {
 	Grid   []*Cell
 	Width  int
 	Height int
 }
 
-func (g *Game)ToJson()[]byte{
+func (g *Game) ToJson() []byte {
 	out, err := json.Marshal(g)
 	if err != nil {
 		log.Fatal(err)
@@ -47,16 +47,16 @@ func (g *Game)ToJson()[]byte{
 	return out
 }
 
-func NewGame(width,height int)*Game{
+func NewGame(width, height int) *Game {
 	g := &Game{
-		Width:width,
-		Height:height,
+		Width:  width,
+		Height: height,
 	}
 	return g
 }
 
-func (g *Game) Generate()error{
- 	g.Grid = GenerateCells(g.Width,g.Height)
+func (g *Game) Generate() error {
+	g.Grid = GenerateCells(g.Width, g.Height)
 	err := g.MixSeed()
 	if err != nil {
 		return err
@@ -64,34 +64,33 @@ func (g *Game) Generate()error{
 	return nil
 }
 
-
 // FirstMixSeed mix the cell status
 // The first generation is created by applying the above rules simultaneously to every cell in the seed; births and deaths occur simultaneously,
-func (g *Game) MixSeed()error{
-	if len(g.Grid)==0{
+func (g *Game) MixSeed() error {
+	if len(g.Grid) == 0 {
 		return errors.New("empty game Grid")
 	}
 	wg := &sync.WaitGroup{}
-	for _,c :=  range g.Grid {
+	for _, c := range g.Grid {
 		wg.Add(2)
-		go func (c *Cell,wg *sync.WaitGroup){
+		go func(c *Cell, wg *sync.WaitGroup) {
 			c.Status = true
 			defer wg.Done()
-		}(c,wg)
-		go func (c *Cell,wg *sync.WaitGroup){
+		}(c, wg)
+		go func(c *Cell, wg *sync.WaitGroup) {
 			c.Status = false
 			defer wg.Done()
-		}(c,wg)
+		}(c, wg)
 	}
 	wg.Wait()
 	return nil
 }
 
-func  (g *Game) Tick(){
-	for _,c := range g.Grid{
+func (g *Game) Tick() {
+	for _, c := range g.Grid {
 		c.NextStatus = c.GetNextState()
 	}
-	for _,c := range g.Grid{
+	for _, c := range g.Grid {
 		c.Status = c.NextStatus
 	}
 }
